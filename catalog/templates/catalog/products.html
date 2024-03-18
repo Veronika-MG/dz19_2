@@ -10,7 +10,7 @@
                  alt="Card image cap">
             <div class="card-body">
                 <p class="card-text">{{ object.name|title }}</p>
-                <p class="card-text">{{ object.description }}</p>
+                <p class="card-text">{{ object.description|truncatechars:100 }}</p>
                 <p class="card-text">{{ object.price }} ₽</p>
             </div>
         </div>
