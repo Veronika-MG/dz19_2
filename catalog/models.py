@@ -20,9 +20,9 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание')
     image = models.ImageField(upload_to='product/', **NULLABLE)
     # category = models.CharField(max_length=100, verbose_name='Категория')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория', help_text='Выберите категорию')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
-    date_of_creation = models.DateField(verbose_name='Дата создания', **NULLABLE)
+    date_of_creation = models.DateField(auto_now_add=False, verbose_name='Дата изготовления', **NULLABLE, help_text='В формате "дд.мм.гггг"')
     last_modified_date = models.DateField(**NULLABLE)
 
     def __str__(self):

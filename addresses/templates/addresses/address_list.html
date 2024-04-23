@@ -1,0 +1,46 @@
+{% extends 'catalog/home.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="col-12 mb-5">
+    <a class="btn btn-success" href="{% url 'addresses:create' %}">Добавить адрес</a>
+</div>
+<div class="row">
+    {% for object in object_list %}
+    <div class="col-md-4">
+        <div class="card mb-4 box-shadow">
+            <img class="card-img-top"
+                 src="{{ object.image|mymedia }}"
+                 alt="Card image cap">
+            <div class="card-body">
+                <p class="card-text">
+                    {% if object.is_published %}
+                    {{ object|title }}
+                    {% else %}
+                    <span class="text-muted">{{ object|title }}</span>
+                    {% endif %}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <a href="{% url 'addresses:view' object.pk %}" type="button"
+                           class="btn btn-sm btn-outline-info">Посмотреть</a>
+                        <a href="{% url 'addresses:edit' object.pk %}" type="button"
+                           class="btn btn-sm btn-outline-warning">Изменить</a>
+                        <a href="{% url 'addresses:delete' object.pk %}" type="button"
+                           class="btn btn-sm btn-outline-danger">Удалить</a>
+                    </div>
+                    {% if object.is_published %}
+                    <a class="btn btn-warning" href="{% url 'addresses:toggle_activity' object.pk %}">X</a>
+                    {% else %}
+                    <a class="btn btn-success" href="{% url 'addresses:toggle_activity' object.pk %}">V</a>
+                    {% endif %}
+                </div>
+
+                <tr>
+                    <td>Просмотры: {{ object.views_count }}</td>
+                </tr>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
