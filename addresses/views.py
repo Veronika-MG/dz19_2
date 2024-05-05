@@ -7,26 +7,28 @@ from addresses.models import Address
 
 
 class AddressCreateView(CreateView):
+    """Класс для создания адреса"""
     model = Address
     fields = ('title', 'location', 'date_of_creation', 'is_published', 'image')
     success_url = reverse_lazy('addresses:list')
 
     def form_valid(self, form):
         if form.is_valid():
-            new_mat = form.save()
+            new_mat = form.save(commit=False)
             new_mat.slug = slugify(new_mat.title)
             new_mat.save()
 
         return super().form_valid(form)
 
 class AddressUpdateView(UpdateView):
+    """Класс для изменения адреса"""
     model = Address
     fields = ('title', 'location', 'image', 'date_of_creation', 'is_published')
     # success_url = reverse_lazy('addresses:list')
 
     def form_valid(self, form):
         if form.is_valid():
-            new_mat = form.save()
+            new_mat = form.save(commit=False)
             new_mat.slug = slugify(new_mat.title)
             new_mat.save()
 
@@ -36,15 +38,18 @@ class AddressUpdateView(UpdateView):
         return reverse('addresses:view', args=[self.kwargs.get('pk')])
 
 class AddressListView(ListView):
+    """Класс для вывода всех адресов"""
     model = Address
     extra_context = {"title": "Адреса магазинов"}
 
     def get_queryset(self, *args, **kwargs):
+        """ Метод для определения актуальных адресов"""
         queryset = super().get_queryset(*args, **kwargs)
-        queryset = queryset.filter(is_published=False)
+        queryset = queryset.filter(is_published=True)
         return queryset
 
 class AddressDetailView(DetailView):
+    """Класс для вывода информации об адресе по его pk"""
     model = Address
 
     def get_object(self, queryset=None):
@@ -54,6 +59,7 @@ class AddressDetailView(DetailView):
         return self.object
 
 class AddressDeleteView(DeleteView):
+    """Класс для удаления адреса"""
     model = Address
     success_url = reverse_lazy('addresses:list')
 

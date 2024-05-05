@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="col-12 mb-5">
-  <a class="btn btn-outline-dark" href="{% url 'catalog:categories' %}">К категориям</a>
+    <a class="btn btn-outline-dark" href="{% url 'catalog:categories' %}">К категориям</a>
 </div>
 <div class="col-12 mb-5">
     <a class="btn btn-success" href="{% url 'catalog:create' %}">Добавить продукт</a>
@@ -18,7 +18,7 @@
             <div class="card-body">
                 <p class="card-text">{{ object.name|title }}</p>
                 <p class="card-text">{{ object.description|truncatechars:100 }}</p>
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="btn-group">
                         <a href="{% url 'catalog:view' object.pk %}"
                            class="btn btn-sm btn-outline-info">Посмотреть</a>
@@ -28,6 +28,16 @@
                            class="btn btn-sm btn-outline-danger">Удалить</a>
                     </div>
                 </div>
+                <div>
+                    {% for version in object.version_set.all %}
+                    {% if version.current_version %}
+                    <p>Номер текущей версии: {{ version.number }}</p>
+                    <p>Название текущей версии: {{ version.name }}</p>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <a class="btn btn-outline-dark" href="{% url 'catalog:versions' object.pk %}">Посмотреть версии</a>
+
             </div>
         </div>
     </div>
