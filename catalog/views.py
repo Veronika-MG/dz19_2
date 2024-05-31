@@ -1,6 +1,8 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
@@ -20,6 +22,7 @@ def index(request):
     }
     return render(request, 'catalog/index.html', context)
 
+@login_required
 def categories(request):
     context = {
         'object_list': Category.objects.all(),
@@ -27,6 +30,7 @@ def categories(request):
     }
     return render(request, 'catalog/categories.html', context)
 
+@login_required
 def category_products(request, pk):
     category_item = Category.objects.get(pk=pk)
     context = {
@@ -35,7 +39,7 @@ def category_products(request, pk):
     }
     return render(request, 'catalog/products.html', context)
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     """Класс для вывода списка продуктов"""
     model = Product
     template_name = 'catalog/products.html'
@@ -48,7 +52,7 @@ class ProductListView(ListView):
     #     return context
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     """Класс для вывода информации о продукте по его pk"""
     model = Product
 
@@ -70,28 +74,33 @@ def contacts(request):
         print(f'{name} {phone}: {message}')
     return render(request, 'catalog/contacts.html', context)
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     """ Класс для создания продукта. """
     model = Product
     form_class = ProductForm
     # fields = ('name', 'description', 'category', 'price', 'date_of_creation', 'image')
     success_url = reverse_lazy('catalog:products')
+    def form_valid(self, form):
+        product = form.save(commit=False)
+        product.user = self.request.user
+        product.save()
+        return redirect(self.success_url)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     """ Класс для редактирования продукта. """
     model = Product
     fields = ('name', 'description', 'category', 'price', 'date_of_creation', 'image')
     success_url = reverse_lazy('catalog:products')
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     """ Класс для удаления продукта. """
     model = Product
     success_url = reverse_lazy('catalog:products')
 
 
-class VersionListView(ListView):
+class VersionListView(LoginRequiredMixin, ListView):
     """Класс для вывода списка версий определенного продукта"""
     model = Version
     extra_context = {"title": "Версии"}
@@ -105,7 +114,7 @@ class VersionListView(ListView):
         # context_data['object_list'] = self.model.objects.filter(pk=self.kwargs.get('pk'))
         return context_data
 
-class VersionCreateView(CreateView):
+class VersionCreateView(LoginRequiredMixin, CreateView):
     """Класс для создания версии"""
     model = Version
     form_class = VersionForm
@@ -125,7 +134,7 @@ class VersionCreateView(CreateView):
     #     self.object.save()
     #     return HttpResponseRedirect(self.get_success_url())
 
-class VersionUpdateView(UpdateView):
+class VersionUpdateView(LoginRequiredMixin, UpdateView):
     """Класс для редактирования версии. """
     model = Version
     form_class = VersionForm
@@ -138,7 +147,7 @@ class VersionUpdateView(UpdateView):
         context['pk'] = self.object.product.pk
         return context
 
-class VersionDetailView(DetailView):
+class VersionDetailView(LoginRequiredMixin, DetailView):
     """ Класс для вывода информации о версии по его pk"""
     model = Version
 
@@ -147,7 +156,7 @@ class VersionDetailView(DetailView):
         context['pk'] = self.object.product.pk
         return context
 
-class VersionDeleteView(DeleteView):
+class VersionDeleteView(LoginRequiredMixin, DeleteView):
     """Класс для удаления версии"""
     model = Version
     # success_url = reverse_lazy('catalog:versions')
