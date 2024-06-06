@@ -31,6 +31,7 @@ class Product(models.Model):
     date_of_creation = models.DateField(auto_now_add=False, verbose_name='Дата изготовления', **NULLABLE, help_text='В формате "дд.мм.гггг"')
     last_modified_date = models.DateField(**NULLABLE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    is_published = models.BooleanField(default=False, verbose_name='опубликовано')
 
     def __str__(self):
         return f'{self.name}: {self.price}  ({self.category})'
@@ -39,6 +40,9 @@ class Product(models.Model):
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
         ordering = ('category',)
+        permissions = [
+            ('can_publish', 'Право доступа для публикации')
+        ]
 
 class Version(models.Model):
     """ Модель для версии продукта """

@@ -41,10 +41,14 @@
           <div class="card-footer">
             <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <a href="{% url 'catalog:edit' object.pk %}" type="button"
+                            {% if user == object.owner or perms.product.can_publish and perms.product.change_product %}
+                                <a href="{% url 'catalog:edit' object.pk %}" type="button"
                                class="btn btn-sm btn-outline-warning">Изменить</a>
-                            <a href="{% url 'catalog:delete' object.pk %}" type="button"
+                            {% endif %}
+                            {% if perms.catalog.delete_product %}
+                                <a href="{% url 'catalog:delete' object.pk %}" type="button"
                                class="btn btn-sm btn-outline-danger">Удалить</a>
+                            {% endif %}
                         </div>
                 <a class="btn btn-outline-dark" href="{% url 'catalog:versions' object.pk %}">Версии</a>
                     </div>

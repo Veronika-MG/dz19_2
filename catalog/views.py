@@ -1,5 +1,6 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
@@ -10,11 +11,14 @@ from pytils.translit import slugify
 from catalog.forms import VersionForm, ProductForm
 from catalog.models import Category, Product, Version
 
-
+@login_required
+@permission_required('catalog.view_product')
 def home(request):
     return render(request, 'catalog/home.html')
 
 
+@login_required
+@permission_required('catalog.view_product')
 def index(request):
     context = {
         'object_list': Category.objects.all(),
@@ -31,6 +35,7 @@ def categories(request):
     return render(request, 'catalog/categories.html', context)
 
 @login_required
+@permission_required('catalog.view_product')
 def category_products(request, pk):
     category_item = Category.objects.get(pk=pk)
     context = {
@@ -94,10 +99,26 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('catalog:products')
 
 
+    def get_object(self, queryset=None):
+        """ Переопределение метода для проверки принадлежности и прав доступа """
+        obj = super().get_object(queryset)
+        perms = ['product.change_product', 'product.can_publish']
+        if obj.user == self.request.user or self.request.user.has_perms(perms):
+            return obj
+        raise PermissionDenied
+
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     """ Класс для удаления продукта. """
     model = Product
     success_url = reverse_lazy('catalog:products')
+
+    def get_object(self, queryset=None):
+        """ Переопределение метода для проверки принадлежности и прав доступа """
+        obj = super().get_object(queryset)
+        perms = ['product.delete_product']
+        if obj.user == self.request.user or self.request.user.has_perms(perms):
+            return obj
+        raise PermissionDenied
 
 
 class VersionListView(LoginRequiredMixin, ListView):

@@ -6,7 +6,9 @@
     <a class="btn btn-outline-dark" href="{% url 'catalog:categories' %}">К категориям</a>
 </div>
 <div class="col-12 mb-5">
-    <a class="btn btn-success" href="{% url 'catalog:create' %}">Добавить продукт</a>
+    {% if perms.catalog.add_product %}
+        <a class="btn btn-success" href="{% url 'catalog:create' %}">Добавить продукт</a>
+    {% endif %}
 </div>
 <div class="row">
     {% for object in object_list %}
@@ -22,10 +24,14 @@
                     <div class="btn-group">
                         <a href="{% url 'catalog:view' object.pk %}"
                            class="btn btn-sm btn-outline-info">Посмотреть</a>
-                        <a href="{% url 'catalog:edit' object.pk %}" type="button"
+                        {% if user == object.owner or perms.product.can_publish and perms.product.change_product %}
+                            <a href="{% url 'catalog:edit' object.pk %}" type="button"
                            class="btn btn-sm btn-outline-warning">Изменить</a>
-                        <a href="{% url 'catalog:delete' object.pk %}" type="button"
+                        {% endif %}
+                        {% if perms.catalog.delete_product %}
+                            <a href="{% url 'catalog:delete' object.pk %}" type="button"
                            class="btn btn-sm btn-outline-danger">Удалить</a>
+                        {% endif %}
                     </div>
                 </div>
                 <div>
