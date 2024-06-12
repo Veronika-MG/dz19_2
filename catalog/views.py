@@ -10,6 +10,8 @@ from pytils.translit import slugify
 
 from catalog.forms import VersionForm, ProductForm
 from catalog.models import Category, Product, Version
+from services.catalog import get_categories
+
 
 @login_required
 @permission_required('catalog.view_product')
@@ -29,7 +31,7 @@ def index(request):
 @login_required
 def categories(request):
     context = {
-        'object_list': Category.objects.all(),
+        'object_list': get_categories(),
         'title': 'Магазин - Категории'
     }
     return render(request, 'catalog/categories.html', context)
@@ -37,7 +39,7 @@ def categories(request):
 @login_required
 @permission_required('catalog.view_product')
 def category_products(request, pk):
-    category_item = Category.objects.get(pk=pk)
+    category_item = get_categories().get(pk=pk)
     context = {
         'object_list': Product.objects.filter(category_id=pk),
         'title': f'Продукты категории "{category_item.name}"'

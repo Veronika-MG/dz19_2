@@ -23,7 +23,7 @@ dotenv.load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--2m8%&zdp-y!3-o$+)d18j@-!ph#9&nf_zknw(zuh#4caqzdm-'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,12 +82,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'catalog', # Название БД
-        'USER': 'postgres', # Пользователь для подключения
-        'PASSWORD': '2362', # Пароль для этого пользователя
-        'HOST': '127.0.0.1', # Адрес, на котором развернут сервер БД
-        'PORT': 5432, # Порт, на котором работает сервер БД
+        'ENGINE': os.getenv('ENGINE'),
+        'NAME': os.getenv('NAME'), # Название БД
+        'USER': os.getenv('POSTGRES_USER'), # Пользователь для подключения
+        'PASSWORD': os.getenv('PASSWORD'), # Пароль для этого пользователя
+        'HOST': os.getenv('HOST'), # Адрес, на котором развернут сервер БД
+        'PORT': os.getenv('PORT'), # Порт, на котором работает сервер БД
     }
 }
 
@@ -149,3 +149,13 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = '89653733337@mail.ru'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+CACHE_ENABLED = os.getenv('CACHE_ENABLED')
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379",
+            "TIMEOUT": 300 # Ручная регулировка времени жизни кеша в секундах, по умолчанию 300
+        }
+    }
